@@ -1,9 +1,3 @@
 [submodule "WiringPi"]
-    path = WiringPi
-    url = https://gitee.com/study-dp/WiringPi.git
-    branch = master
-
-[submodule "pybind11"]
-    path = pybind11
-    url = https://github.com/pybind/pybind11.git
-    branch = master
+	path = WiringPi
+	url = https://gitee.com/study-dp/WiringPi
