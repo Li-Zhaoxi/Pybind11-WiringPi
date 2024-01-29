@@ -1,3 +1,6 @@
-[submodule "WiringPi"]
-	path = WiringPi
+[submodule "3rdparty/WiringPi-RDK"]
+	path = 3rdparty/WiringPi-RDK
 	url = https://gitee.com/study-dp/WiringPi
+[submodule "3rdparty/pybind11"]
+	path = 3rdparty/pybind11
+	url = https://github.com/pybind/pybind11
