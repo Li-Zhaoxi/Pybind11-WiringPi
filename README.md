@@ -50,18 +50,6 @@ If you can `import WiringPi` correctly,  it means that you have successfully com
 ```
 pip3 install sphinx
 ```
-<table>
-	<tr>
-		<td  rowspan = "2"> 单元格1 </td>
-		<td> 单元格2 </td>
-	</tr>
-	<tr>
-		<td> 单元格4 </td>
-	</tr>
-​</table>
-
-| Headers | Module | Declaration: Python | Declaration: C++ |
-|:-------:|:-------:|:-------:|:-------:|
 
 
 
@@ -78,21 +66,8 @@ pip3 install sphinx
   <tr align = "center">
     <td> <code> ads1115.h</code></td>
     <td> <code> WiringPi.adc</code></td>
-    <td align = "left"> 
-      <code> 
-        def ads1115Setup(
-        <br>&nbsp;&nbsp;pinBase: int, 
-        <br>&nbsp;&nbsp;i2cAddress: int
-        <br>) -> bool
-      </code>
-    </td>
-    <td align = "left"> 
-      <code> 
-        int ads1115Setup(
-        <br>&nbsp;&nbsp;int pinBase, 
-        <br>&nbsp;&nbsp;int i2cAddress);
-      </code>
-    </td>
+    <td align = "left"> <code> def ads1115Setup(<br>&nbsp;&nbsp;pinBase: int, <br>&nbsp;&nbsp;i2cAddress: int<br>)-> bool</code></td>
+    <td align = "left"> <code> int ads1115Setup(<br>&nbsp;&nbsp;pinBase: int, <br>&nbsp;&nbsp;i2cAddress: int<br>);</code></td>
   </tr>
   <tr align = "center">
     <td> <code> max31855.h</code></td>
@@ -134,5 +109,3 @@ pip3 install sphinx
   </tr>
 
 </table>
-
-| `max5322.h` | ```def max5322Setup(<br> pinBase: int, spiChannel: int) -> bool``` | `def max5322Setup(pinBase: int, spiChannel: int) -> bool` | `int max5322Setup (int pinBase, int spiChannel)` |
