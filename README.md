@@ -60,28 +60,79 @@ pip3 install sphinx
 	</tr>
 ​</table>
 
-<table>
-	<tr>
-		<td  colspan = "2"> 单元格1 </td>
-	</tr>
-	<tr>
-		<td> 单元格3 </td>
-		<td> 单元格4 </td>
-	</tr>
-</table>
-
 | Headers | Module | Declaration: Python | Declaration: C++ |
 |:-------:|:-------:|:-------:|:-------:|
-| `ads1115.h` | `WiringPi.adc` | `def ads1115Setup(pinBase: int, i2cAddress: int) -> bool` | `int ads1115Setup (int pinBase, int i2cAddress)` |
-| `max31855.h` | `WiringPi.adc` | `def max31855Setup(pinBase: int, spiChannel: int) -> bool` | `int max31855Setup (int pinBase, int spiChannel)` |
-| `max5322.h` | `WiringPi.adc` | `def max5322Setup(pinBase: int, spiChannel: int) -> bool` | `int max5322Setup (int pinBase, int spiChannel)` |
 
-|-------|-------|-------| -------|
-| 单元格1 | 单元格2 | 单元格3 | 单元格3 |
-| 单元格4 | 单元格5 | 单元格6 | 单元格6 |
 
- | 表头1 | 表头2 |
- | --- | --- |
- | <td colspan="2">合并单元格</td>|
- | 单元格1 | 单元格2 |
 
+<table>
+	<tr align = "center">
+    <td  rowspan = "2"> Header </td>
+    <td  rowspan = "2"> Module </td>
+		<td  colspan = "2"> Declaration </td>
+	</tr>
+  <tr align = "center">
+    <td> Python </td>
+    <td> C++ </td>
+	</tr>
+  <tr align = "center">
+    <td> <code> ads1115.h</code></td>
+    <td> <code> WiringPi.adc</code></td>
+    <td align = "left"> 
+      <code> 
+        def ads1115Setup(
+        <br>&nbsp;&nbsp;pinBase: int, 
+        <br>&nbsp;&nbsp;i2cAddress: int
+        <br>) -> bool
+      </code>
+    </td>
+    <td align = "left"> 
+      <code> 
+        int ads1115Setup(
+        <br>&nbsp;&nbsp;int pinBase, 
+        <br>&nbsp;&nbsp;int i2cAddress);
+      </code>
+    </td>
+  </tr>
+  <tr align = "center">
+    <td> <code> max31855.h</code></td>
+    <td> <code> WiringPi.adc</code></td>
+    <td align = "left"> 
+      <code> 
+        def max31855Setup(
+        <br>&nbsp;&nbsp;pinBase: int, 
+        <br>&nbsp;&nbsp;spiChannel: int
+        <br>) -> bool
+      </code>
+    </td>
+    <td align = "left"> 
+      <code> 
+        int max31855Setup(
+        <br>&nbsp;&nbsp;int pinBase, 
+        <br>&nbsp;&nbsp;int spiChannel);
+      </code>
+    </td>
+  </tr>
+  <tr align = "center">
+    <td> <code> max5322.h</code></td>
+    <td> <code> WiringPi.adc</code></td>
+    <td align = "left"> 
+      <code> 
+        def max5322Setup(
+        <br>&nbsp;&nbsp;pinBase: int, 
+        <br>&nbsp;&nbsp;spiChannel: int
+        <br>) -> bool
+      </code>
+    </td>
+    <td align = "left"> 
+      <code> 
+        int max5322Setup(
+        <br>&nbsp;&nbsp;int pinBase, 
+        <br>&nbsp;&nbsp;int spiChannel);
+      </code>
+    </td>
+  </tr>
+
+</table>
+
+| `max5322.h` | ```def max5322Setup(<br> pinBase: int, spiChannel: int) -> bool``` | `def max5322Setup(pinBase: int, spiChannel: int) -> bool` | `int max5322Setup (int pinBase, int spiChannel)` |
