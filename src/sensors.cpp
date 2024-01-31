@@ -1,5 +1,6 @@
 #include "submodules.h"
 #include <optional>
+#include <variant>
 
 #include <bmp180.h>
 #include <ds18b20.h>
@@ -108,17 +109,17 @@ void supplement_maxdetect(py::module_ &subm)
         else return None
     )pbdoc"
   );
-
+  
   subm.def(
     "readRHT03", 
-    [](int pin) -> std::optional<std::tuple<int, int>>
+    [](int pin) -> std::variant<std::tuple<int, int>, py::none>
     {
       int temp, rh;
       int state = readRHT03(pin, &temp, &rh);
       if (state)
         return std::make_tuple(temp, rh);
       else
-        return std::nullopt;
+        return py::none();
     }, 
     py::arg("pin"),
     R"pbdoc(
