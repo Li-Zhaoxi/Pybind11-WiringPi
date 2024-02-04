@@ -2,6 +2,9 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+import importlib
+
+import shutil
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
@@ -11,9 +14,11 @@ from setuptools.command.build_ext import build_ext
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "") -> None:
+    def __init__(self, name: str, sourcedir: str = "", import_all: bool = False, parallel = 1) -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
+        self.import_all = import_all
+        self.parallel = parallel
 
 
 class CMakeBuild(build_ext):
@@ -68,22 +73,91 @@ class CMakeBuild(build_ext):
         if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
             # self.parallel is a Python 3 only way to set parallel jobs by hand
             # using -j in the build_ext call, not supported by pip or PyPA-build.
-            if hasattr(self, "parallel") and self.parallel:
-                # CMake 3.12+ only.
-                build_args += [f"-j{self.parallel}"]
+            parallel_num = ext.parallel
+            if parallel_num <= 0:
+                build_args += ["-j"]
+            else:
+                build_args += [f"-j{parallel_num}"]
 
         build_temp = Path(self.build_temp) / ext.name
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
             
-        print(ext.sourcedir, cmake_args)
+        print(ext.sourcedir, cmake_args, build_temp, build_args)
 
-        # subprocess.run(
-        #     ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
-        # )
-        # subprocess.run(
-        #     ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
-        # )
+        subprocess.run(
+            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
+        )
+        subprocess.run(
+            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
+        )
+        
+        # self.build_lib: build/lib.linux-aarch64-3.8
+        subprocess.run(
+            ["stubgen", "-p", ext.name,  
+             "--include-docstrings", "--inspect-mode", 
+             "--include-private",
+             "-o", "./"], 
+            cwd = self.build_lib, check=True)
+    
+    def make_init_py(self):
+        init_codes = []
+        package_folder = ""
+        for ext in self.extensions:
+            if isinstance(ext, CMakeExtension):
+                ext_levels = ext.name.split(".")
+                # 暂不支持多层so的cmake问题, 待有明确需求时会适配
+                assert len(ext_levels) == 2 
+                package_folder = ext_levels[0]
+                if ext.import_all:                    
+                    init_codes.append(f"from .{ext_levels[-1]} import *\n")
+        
+        pypath = os.path.join(self.build_lib, package_folder, "__init__.py")
+        with open(pypath, "w") as f:
+            f.writelines(init_codes)
+        
+        
+        # 构建对应的pyi文件，这种pyi其实就是py的一个拷贝，
+        shutil.copyfile(pypath, pypath + "i")
+    
+    def supplement_module_docstrings(self, ext_name, fileroot):
+        split_names = ext_name.split(".")
+
+        module_root = os.path.join(fileroot, *split_names)
+        
+        for filename in os.listdir(module_root):
+            filepath = os.path.join(module_root, filename)
+            print(f"Add docstrings to {filepath}")
+            with open(filepath, "r") as f:
+                file_context = f.read()
+            if filename == "__init__.pyi":
+                module = importlib.import_module(".".join(split_names))
+            elif not os.path.isdir(filepath) and filepath.endswith(".pyi"):
+                module_name = filename.split(".")[0]
+                module = importlib.import_module(".".join(split_names + [module_name]))
+            else:
+                raise Exception(f"Not support to format {filepath}")
+
+            file_context = f"\"\"\" {module.__name__} \n{module.__doc__}\n\"\"\"\n" + file_context
+            with open(filepath, "w") as f:
+                f.write(file_context)
+        
+    
+    def build_extensions(self):
+        super().build_extensions()
+        # 后处理
+        self.make_init_py() # 在包的根目录构造__init__.py
+        
+        # 给每个模块增加docstrings，stubgen没有增加模块的docstirngs
+        libroot = os.path.join(os.getcwd(), self.build_lib)
+        sys.path.append(libroot)
+        for ext in self.extensions:
+            self.supplement_module_docstrings(ext.name, libroot)
+        sys.path.pop()
+        
+        
+        
+        
 
 
 # The information here can also be placed in setup.cfg - better separation of
@@ -95,8 +169,9 @@ setup(
     description="The python version of WiringPi, that is packaged by Pybind11",
     long_description="",
     ext_modules=[
-        CMakeExtension("WiringPi")],
+        CMakeExtension("WiringPi.WiringPi", import_all=True, parallel=3)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     python_requires=">=3.7",
+    include_package_data=True
 )
