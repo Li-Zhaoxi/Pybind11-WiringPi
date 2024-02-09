@@ -383,7 +383,7 @@ void supplement_wiringpi(py::module_ &subm)
   );
 
   subm.def(
-    "digitalWriteByte", &digitalWriteByte2, 
+    "digitalWriteByte2", &digitalWriteByte2, 
     py::arg("value"),
     R"pbdoc(
       digitalWriteByte2

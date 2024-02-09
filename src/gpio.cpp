@@ -45,6 +45,7 @@ void add_submodule_gpio(py::module_ &m)
   supplement_mcp23x17reg(subm);
   supplement_pcf8574(subm);
   supplement_pcf8591(subm);
+  supplement_sr595(subm);
 
   
 }
