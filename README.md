@@ -1,78 +1,71 @@
 # Pybind11-WiringPi
-The python version of WiringPi, that is packaged by Pybind11
+The python version of WiringPi, that is packaged by Pybind11.
+
+
 
 
 ## 1. Installation
 
-由于我们的代码有一些第三方库的依赖，所以在使用前需要先将依赖的so文件进行编译
+If you want to compile this project and generate the wheel file, the compilation and installation process is as follows:
+```bash
+# Install the dependent packages
+sudo pip3 install mypy ninja
 
-```
+# download our project, 'recursive' is indispensable.
 git clone --recursive https://github.com/Li-Zhaoxi/Pybind11-WiringPi
 cd Pybind11-WiringPi
-```
 
-### 1.1 Prepare
-
-- Build and install WiringPi-RDK: 
-```
+# Build and install WiringPi-RDK: 
 cd 3rdparty/WiringPi-RDK
 ./build
-cd ..
+cd ../..
 
-```
-
-### 1.2 Quick install  
-
-这里补充whl的下载链接
-sudo pip3 install package
-
-### 1.3. Build wheel
-
-- Install the dependent packages: `sudo pip3 install mypy ninja`
-- Install Pybind11
-```
+# Install Pybind11
 cd 3rdparty/pybind11
-mkdir build
-cd build
+mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF ..
 sudo make install
+cd ../../..
+
+# Build the wheel of Pybind11-WiringPi
+python3 setup.py bdist_wheel
+
+# Install the built package
+sudo pip3 install dist/WiringPi*.whl
 ```
-- Build wheel. `python3 setup.py bdist_wheel`
+If you want to use the given whl file, please download the wheel from https://github.com/Li-Zhaoxi/Pybind11-WiringPi/releases/, and then the installation process is as follows:
+```bash
+# download our project, 'recursive' is indispensable.
+git clone --recursive https://github.com/Li-Zhaoxi/Pybind11-WiringPi
+cd Pybind11-WiringPi
+
+# Build and install WiringPi-RDK: 
+cd 3rdparty/WiringPi-RDK
+./build
+cd ../..
+
+# Install the given wheel
+sudo pip3 install <path>/WiringPi-*.whl
+```aa
+
+If you can `import WiringPi` correctly,  it means that you have successfully installed this project.
 
 
-A file named like "WiringPi.cpython-38-aarch64-linux-gnu.so" will be built in the folder `build`.
+## 2. Usage
 
-If you can `import WiringPi` correctly,  it means that you have successfully compiled this project.
+After `import WiringPi`, you can directly see all function interfaces and related comments within the package under the development environment of VSCode
+<div align="center">
+  <img src="doc/usage.png" width="1000px" />
+</div>
 
-## How to use
+In the section 'Appendix', I have added all interface declarations in each module. If you know the name of the function to be called, you can directly search for the name in README to obtain the way to call this function. For example, the calling method of the `softPwmCreate` function is`from WiringPi.softdrive import softPwmCreate`.
+<div align="center">
+  <img src="doc/callfun.png" width="800px" />
+</div>
 
-需要哪些函数请在后面的appendx中检索python用法。
-目前已经支持注释自动弹出，
+## 3. Appendix
 
-比如我们想使用pwm控制，在c++中是这样用的，在python中是这样用的。
-
-
-## 2. Contribution
-
-设计思想：C++各种驱动的py版本，因此不想构造太多文件层级。每个模块独立构造个so文件，该so文件会连接到C++版本，保证当同时加载时，能减少内存占用。
-
-介绍如何贡献代码
-- 如果想修改现有模块
-- 如果想增加现有模块
-- 修改之后最好做好文档检查，补充对应的pyi以及README
-
-目前遗留的需要优化项：
-1. 需要更多的测试
-2. 需要规范文档
-3. 怎么做单元测试
-4. src结构，目前只有一个，
-
-
-
-
-## Appendex
-
-### A. Packaged APIs
+### 3.1. Packaged APIs
 
 - Module `WiringPi.adc` inclues:
   - `def ads1115Setup(pinBase: int, i2cAddress: int) -> bool` (Source: ads1115.h)
@@ -230,156 +223,162 @@ If you can `import WiringPi` correctly,  it means that you have successfully com
 - Module `WiringPi.led` includes:
   - `def sn3218Setup(pinBase: int) -> bool` (Source: sn3218.h)
 - Module `WiringPi.rtc` includes:
-  - `def ds1302clockRead() -> numpy.ndarray[numpy.int32]`
-  - `def ds1302clockWrite(clockData: numpy.ndarray[numpy.int32]) -> None`
-  - `def ds1302ramRead(addr: int) -> int`
-  - `def ds1302ramWrite(addr: int, data: int) -> None`
-  - `def ds1302rtcRead(reg: int) -> int`
-  - `def ds1302rtcWrite(reg: int, data: int) -> None`
-  - `def ds1302setup(clockPin: int, dataPin: int, csPin: int) -> None`
-  - `def ds1302trickleCharge(diodes: int, resistors: int) -> None`
+  - `def ds1302clockRead() -> numpy.ndarray[numpy.int32]` (Source: ds1302.h)
+  - `def ds1302clockWrite(clockData: numpy.ndarray[numpy.int32]) -> None` (Source: ds1302.h)
+  - `def ds1302ramRead(addr: int) -> int` (Source: ds1302.h)
+  - `def ds1302ramWrite(addr: int, data: int) -> None` (Source: ds1302.h)
+  - `def ds1302rtcRead(reg: int) -> int` (Source: ds1302.h)
+  - `def ds1302rtcWrite(reg: int, data: int) -> None` (Source: ds1302.h)
+  - `def ds1302setup(clockPin: int, dataPin: int, csPin: int) -> None` (Source: ds1302.h)
+  - `def ds1302trickleCharge(diodes: int, resistors: int) -> None` (Source: ds1302.h)
 - Module `WiringPi.sensors` includes:
-  - `def bmp180Setup(pinBase: int) -> bool`
-  - `def ds18b20Setup(pinBase: int, deviceId: str) -> bool`
-  - `def htu21dSetup(pinBase: int) -> bool`
-  - `def maxDetectRead(pin: int) -> std::optional<array_t<unsigned char, 16> >`
-  - `def readRHT03(pin: int) -> std::variant<std::tuple<int, int>, none>`
-  - `def rht03Setup(pinBase: int, devicePin: int) -> bool`
+  - `def bmp180Setup(pinBase: int) -> bool` (Source: bmp180.h)
+  - `def ds18b20Setup(pinBase: int, deviceId: str) -> bool` (Source: ds18b20.h)
+  - `def htu21dSetup(pinBase: int) -> bool` (Source: htu21d.h)
+  - `def maxDetectRead(pin: int) -> std::optional<array_t<unsigned char, 16> >` (Source: maxdetect.h)
+  - `def readRHT03(pin: int) -> std::variant<std::tuple<int, int>, none>` (Source: rht03.h)
+  - `def rht03Setup(pinBase: int, devicePin: int) -> bool` (Source: rht03.h)
 - Module `WiringPi.softdriven` includes:
-  - `def pseudoPinsSetup(pinBase: int) -> bool`
-  - `def softPwmCreate(pin: int, value: int, range: int) -> int`
-  - `def softPwmStop(pin: int) -> None`
-  - `def softPwmWrite(pin: int, value: int) -> None`
-  - `def softServoSetup(p0: int, p1: int, p2: int, p3: int, p4: int, p5: int, p6: int, p7: int) -> int`
-  - `def softServoWrite(pin: int, value: int) -> None`
-  - `def softToneCreate(pin: int) -> int`
-  - `def softToneStop(pin: int) -> None`
-  - `def softToneWrite(pin: int, freq: int) -> None`
-- Module `WiringPi.softdriven` includes:
-  - `def analogRead(pin: int) -> int`
-  - `def analogWrite(pin: int, value: int) -> None`
-  - `def delay(howLong: int) -> None`
-  - `def delayMicroseconds(howLong: int) -> None`
-  - `def digitalRead(pin: int) -> int`
-  - `def digitalReadByte() -> int`
-  - `def digitalReadByte2() -> int`
-  - `def digitalWrite(pin: int, value: int) -> None`
-  - `def digitalWriteByte(value: int) -> None`
-  - `def digitalWriteByte2(value: int) -> None`
-  - `def getAlt(pin: int) -> int`
-  - `def gpioClockSet(pin: int, freq: int) -> None`
-  - `def loadWPiExtension(progName: str, extensionData: str, verbose: int) -> bool`
-  - `def micros() -> int`
-  - `def millis() -> int`
-  - `def physPinToGpio(physPin: int) -> int`
-  - `def piBoardId() -> tuple[int, int, int, int, int]`
-  - `def piGpioLayout() -> int`
-  - `def piHiPri(pri: int) -> int`
-  - `def piLock(key: int) -> None`
-  - `piThreadCreate(fn: std::function<void* (void*)>) -> int`
-  - `def piUnlock(key: int) -> None`
-  - `def pinMode(pin: int, mode: int) -> None`
-  - `def pinModeAlt(pin: int, mode: int) -> None`
-  - `def pullUpDnControl(pin: int, pud: int) -> None`
-  - `def pwmSetClock(divisor: int) -> None`
-  - `def pwmSetDuty(pin: int, duty_cycle_ns: int) -> None`
-  - `def pwmSetFreq(pin: int, frequency: int) -> None`
-  - `def pwmSetMode(mode: int) -> None`
-  - `def pwmSetRange(range: int) -> None`
-  - `def pwmToneWrite(pin: int, freq: int) -> None`
-  - `def pwmWrite(pin: int, value: int) -> None`
-  - `def serialClose(fd: int) -> None`
-  - `def serialDataAvail(fd: int) -> int`
-  - `def serialFlush(fd: int) -> None`
-  - `def serialGetchar(fd: int) -> int`
-  - `def serialOpen(device: str, baud: int) -> int`
-  - `def serialPutchar(fd: int, c: int) -> None`
-  - `def serialPuts(fd: int, message: str) -> None`
-  - `def setPadDrive(group: int, value: int) -> None`
-  - `def shiftIn(dPin: int, cPin: int, order: int) -> int`
-  - `def shiftOut(dPin: int, cPin: int, order: int, val: int) -> None`
-  - `def waitForInterrupt(pin: int, mS: int) -> int`
-  - `def wiringPiFailure(fatal: int, message: str) -> int`
-  - `def wiringPiI2CRead(fd: int) -> int`
-  - `def wiringPiI2CReadReg16(fd: int, reg: int) -> int`
-  - `def wiringPiI2CReadReg8(fd: int, reg: int) -> int`
-  - `def wiringPiI2CSetup(devId: int) -> int`
-  - `def wiringPiI2CSetupInterface(device: str, devId: int) -> int`
-  - `def wiringPiI2CWrite(fd: int, data: int) -> int`
-  - `def wiringPiI2CWriteReg16(fd: int, reg: int, data: int) -> int`
-  - `def wiringPiI2CWriteReg8(fd: int, reg: int, data: int) -> int`
-  - `def wiringPiISR(pin: int, mode: int, function) -> int`
-  - `def wiringPiSPIDataRW(channel: int, data: int, len: int) -> int`
-  - `def wiringPiSPIGetFd(channel: int) -> int`
-  - `def wiringPiSPISetup(channel: int, speed: int) -> int`
-  - `def wiringPiSPISetupMode(channel: int, speed: int, mode: int) -> int`
-  - `def wiringPiSetup() -> int`
-  - `def wiringPiSetupGpio() -> int`
-  - `def wiringPiSetupPhys() -> int`
-  - `def wiringPiSetupSys() -> int`
-  - `def wiringPiVersion() -> tuple[int, int]`
-  - `def wpiPinToGpio(wpiPin: int) -> int`
-  - `GPIO_CLOCK: int`
-  - `HIGH: int`
-  - `INPUT: int`
-  - `INT_EDGE_BOTH: int`
-  - `INT_EDGE_FALLING: int`
-  - `INT_EDGE_RISING: int`
-  - `INT_EDGE_SETUP: int`
-  - `LOW: int`
-  - `NOTD: int`
-  - `OUTPUT: int`
-  - `PI_ALPHA: int`
-  - `PI_GPIO_MASK: int`
-  - `PI_MAKER_EGOMAN: int`
-  - `PI_MAKER_EMBEST: int`
-  - `PI_MAKER_HORIZON: int`
-  - `PI_MAKER_SONY: int`
-  - `PI_MAKER_UNKNOWN: int`
-  - `PI_MODEL_07: int`
-  - `PI_MODEL_2: int`
-  - `PI_MODEL_3AP: int`
-  - `PI_MODEL_3B: int`
-  - `PI_MODEL_3BP: int`
-  - `PI_MODEL_400: int`
-  - `PI_MODEL_4B: int`
-  - `PI_MODEL_A: int`
-  - `PI_MODEL_AP: int`
-  - `PI_MODEL_B: int`
-  - `PI_MODEL_BP: int`
-  - `PI_MODEL_CM: int`
-  - `PI_MODEL_CM3: int`
-  - `PI_MODEL_CM3P: int`
-  - `PI_MODEL_CM4: int`
-  - `PI_MODEL_RDKX3: int`
-  - `PI_MODEL_RDKX3MD: int`
-  - `PI_MODEL_RDKX3V1_2: int`
-  - `PI_MODEL_RDKX3V2: int`
-  - `PI_MODEL_SDB: int`
-  - `PI_MODEL_ZERO: int`
-  - `PI_MODEL_ZERO_2W: int`
-  - `PI_MODEL_ZERO_W: int`
-  - `PI_VERSION_1: int`
-  - `PI_VERSION_1_1: int`
-  - `PI_VERSION_1_2: int`
-  - `PI_VERSION_2: int`
-  - `PI_VERSION_3: int`
-  - `PI_VERSION_4: int`
-  - `PUD_DOWN: int`
-  - `PUD_OFF: int`
-  - `PUD_UP: int`
-  - `PWM_MODE_BAL: int`
-  - `PWM_MODE_MS: int`
-  - `PWM_OUTPUT: int`
-  - `PWM_TONE_OUTPUT: int`
-  - `SOFT_PWM_OUTPUT: int`
-  - `SOFT_TONE_OUTPUT: int`
-  - `WPI_MODE_GPIO: int`
-  - `WPI_MODE_GPIO_SYS: int`
-  - `WPI_MODE_PHYS: int`
-  - `WPI_MODE_PIFACE: int`
-  - `WPI_MODE_PINS: int`
-  - `WPI_MODE_UNINITIALISED: int`
+  - `def pseudoPinsSetup(pinBase: int) -> bool` (Source: pseudoPins.h)
+  - `def softPwmCreate(pin: int, value: int, range: int) -> int` (Source: softPwm.h)
+  - `def softPwmStop(pin: int) -> None` (Source: softPwm.h)
+  - `def softPwmWrite(pin: int, value: int) -> None` (Source: softPwm.h)
+  - `def softServoSetup(p0: int, p1: int, p2: int, p3: int, p4: int, p5: int, p6: int, p7: int) -> int` (Source: softServo.h)
+  - `def softServoWrite(pin: int, value: int) -> None` (Source: softServo.h)
+  - `def softToneCreate(pin: int) -> int` (Source: softTone.h)
+  - `def softToneStop(pin: int) -> None` (Source: softTone.h)
+  - `def softToneWrite(pin: int, freq: int) -> None` (Source: softTone.h)
+- Module `WiringPi.wiring` includes:
+  - `def analogRead(pin: int) -> int` (Source: wiringPi.h)
+  - `def analogWrite(pin: int, value: int) -> None` (Source: wiringPi.h)
+  - `def delay(howLong: int) -> None` (Source: wiringPi.h)
+  - `def delayMicroseconds(howLong: int) -> None` (Source: wiringPi.h)
+  - `def digitalRead(pin: int) -> int` (Source: wiringPi.h)
+  - `def digitalReadByte() -> int` (Source: wiringPi.h)
+  - `def digitalReadByte2() -> int` (Source: wiringPi.h)
+  - `def digitalWrite(pin: int, value: int) -> None` (Source: wiringPi.h)
+  - `def digitalWriteByte(value: int) -> None` (Source: wiringPi.h)
+  - `def digitalWriteByte2(value: int) -> None` (Source: wiringPi.h)
+  - `def getAlt(pin: int) -> int` (Source: wiringPi.h)
+  - `def gpioClockSet(pin: int, freq: int) -> None` (Source: wiringPi.h)
+  - `def loadWPiExtension(progName: str, extensionData: str, verbose: int) -> bool` (Source: wpiExtensions.h)
+  - `def micros() -> int` (Source: wiringPi.h)
+  - `def millis() -> int` (Source: wiringPi.h)
+  - `def physPinToGpio(physPin: int) -> int` (Source: wiringPi.h)
+  - `def piBoardId() -> tuple[int, int, int, int, int]` (Source: wiringPi.h)
+  - `def piGpioLayout() -> int` (Source: wiringPi.h)
+  - `def piHiPri(pri: int) -> int` (Source: wiringPi.h)
+  - `def piLock(key: int) -> None` (Source: wiringPi.h)
+  - `piThreadCreate(fn: std::function<void* (void*)>) -> int` (Source: wiringPi.h)
+  - `def piUnlock(key: int) -> None` (Source: wiringPi.h)
+  - `def pinMode(pin: int, mode: int) -> None` (Source: wiringPi.h)
+  - `def pinModeAlt(pin: int, mode: int) -> None` (Source: wiringPi.h)
+  - `def pullUpDnControl(pin: int, pud: int) -> None` (Source: wiringPi.h)
+  - `def pwmSetClock(divisor: int) -> None` (Source: wiringPi.h)
+  - `def pwmSetDuty(pin: int, duty_cycle_ns: int) -> None` (Source: wiringPi.h)
+  - `def pwmSetFreq(pin: int, frequency: int) -> None` (Source: wiringPi.h)
+  - `def pwmSetMode(mode: int) -> None` (Source: wiringPi.h)
+  - `def pwmSetRange(range: int) -> None` (Source: wiringPi.h)
+  - `def pwmToneWrite(pin: int, freq: int) -> None` (Source: wiringPi.h)
+  - `def pwmWrite(pin: int, value: int) -> None` (Source: wiringPi.h)
+  - `def serialClose(fd: int) -> None` (Source: wiringSerial.h)
+  - `def serialDataAvail(fd: int) -> int` (Source: wiringSerial.h)
+  - `def serialFlush(fd: int) -> None` (Source: wiringSerial.h)
+  - `def serialGetchar(fd: int) -> int` (Source: wiringSerial.h)
+  - `def serialOpen(device: str, baud: int) -> int` (Source: wiringSerial.h)
+  - `def serialPutchar(fd: int, c: int) -> None` (Source: wiringSerial.h)
+  - `def serialPuts(fd: int, message: str) -> None` (Source: wiringSerial.h)
+  - `def setPadDrive(group: int, value: int) -> None` (Source: wiringPi.h)
+  - `def shiftIn(dPin: int, cPin: int, order: int) -> int` (Source: wiringShift.h)
+  - `def shiftOut(dPin: int, cPin: int, order: int, val: int) -> None` (Source: wiringShift.h)
+  - `def waitForInterrupt(pin: int, mS: int) -> int` (Source: wiringPi.h)
+  - `def wiringPiFailure(fatal: int, message: str) -> int` (Source: wiringPi.h)
+  - `def wiringPiI2CRead(fd: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CReadReg16(fd: int, reg: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CReadReg8(fd: int, reg: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CSetup(devId: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CSetupInterface(device: str, devId: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CWrite(fd: int, data: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CWriteReg16(fd: int, reg: int, data: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiI2CWriteReg8(fd: int, reg: int, data: int) -> int` (Source: wiringPiI2C.h)
+  - `def wiringPiISR(pin: int, mode: int, function) -> int` (Source: wiringPi.h)
+  - `def wiringPiSPIDataRW(channel: int, data: int, len: int) -> int` (Source: wiringPiSPI.h)
+  - `def wiringPiSPIGetFd(channel: int) -> int` (Source: wiringPiSPI.h)
+  - `def wiringPiSPISetup(channel: int, speed: int) -> int` (Source: wiringPiSPI.h)
+  - `def wiringPiSPISetupMode(channel: int, speed: int, mode: int) -> int` (Source: wiringPiSPI.h)
+  - `def wiringPiSetup() -> int` (Source: wiringPi.h)
+  - `def wiringPiSetupGpio() -> int` (Source: wiringPi.h)
+  - `def wiringPiSetupPhys() -> int` (Source: wiringPi.h)
+  - `def wiringPiSetupSys() -> int` (Source: wiringPi.h)
+  - `def wiringPiVersion() -> tuple[int, int]` (Source: wiringPi.h)
+  - `def wpiPinToGpio(wpiPin: int) -> int` (Source: wiringPi.h)
+  - `GPIO_CLOCK: int` (Source: wiringPi.h)
+  - `HIGH: int` (Source: wiringPi.h)
+  - `INPUT: int` (Source: wiringPi.h)
+  - `INT_EDGE_BOTH: int` (Source: wiringPi.h)
+  - `INT_EDGE_FALLING: int` (Source: wiringPi.h)
+  - `INT_EDGE_RISING: int` (Source: wiringPi.h)
+  - `INT_EDGE_SETUP: int` (Source: wiringPi.h)
+  - `LOW: int` (Source: wiringPi.h)
+  - `NOTD: int` (Source: wiringPi.h)
+  - `OUTPUT: int` (Source: wiringPi.h)
+  - `PI_ALPHA: int` (Source: wiringPi.h)
+  - `PI_GPIO_MASK: int` (Source: wiringPi.h)
+  - `PI_MAKER_EGOMAN: int` (Source: wiringPi.h)
+  - `PI_MAKER_EMBEST: int` (Source: wiringPi.h)
+  - `PI_MAKER_HORIZON: int` (Source: wiringPi.h)
+  - `PI_MAKER_SONY: int` (Source: wiringPi.h)
+  - `PI_MAKER_UNKNOWN: int` (Source: wiringPi.h)
+  - `PI_MODEL_07: int` (Source: wiringPi.h)
+  - `PI_MODEL_2: int` (Source: wiringPi.h)
+  - `PI_MODEL_3AP: int` (Source: wiringPi.h)
+  - `PI_MODEL_3B: int` (Source: wiringPi.h)
+  - `PI_MODEL_3BP: int` (Source: wiringPi.h)
+  - `PI_MODEL_400: int` (Source: wiringPi.h)
+  - `PI_MODEL_4B: int` (Source: wiringPi.h)
+  - `PI_MODEL_A: int` (Source: wiringPi.h)
+  - `PI_MODEL_AP: int` (Source: wiringPi.h)
+  - `PI_MODEL_B: int` (Source: wiringPi.h)
+  - `PI_MODEL_BP: int` (Source: wiringPi.h)
+  - `PI_MODEL_CM: int` (Source: wiringPi.h)
+  - `PI_MODEL_CM3: int` (Source: wiringPi.h)
+  - `PI_MODEL_CM3P: int` (Source: wiringPi.h)
+  - `PI_MODEL_CM4: int` (Source: wiringPi.h)
+  - `PI_MODEL_RDKX3: int` (Source: wiringPi.h)
+  - `PI_MODEL_RDKX3MD: int` (Source: wiringPi.h)
+  - `PI_MODEL_RDKX3V1_2: int` (Source: wiringPi.h)
+  - `PI_MODEL_RDKX3V2: int` (Source: wiringPi.h)
+  - `PI_MODEL_SDB: int` (Source: wiringPi.h)
+  - `PI_MODEL_ZERO: int` (Source: wiringPi.h)
+  - `PI_MODEL_ZERO_2W: int` (Source: wiringPi.h)
+  - `PI_MODEL_ZERO_W: int` (Source: wiringPi.h)
+  - `PI_VERSION_1: int` (Source: wiringPi.h)
+  - `PI_VERSION_1_1: int` (Source: wiringPi.h)
+  - `PI_VERSION_1_2: int` (Source: wiringPi.h)
+  - `PI_VERSION_2: int` (Source: wiringPi.h)
+  - `PI_VERSION_3: int` (Source: wiringPi.h)
+  - `PI_VERSION_4: int` (Source: wiringPi.h)
+  - `PUD_DOWN: int` (Source: wiringPi.h)
+  - `PUD_OFF: int` (Source: wiringPi.h)
+  - `PUD_UP: int` (Source: wiringPi.h)
+  - `PWM_MODE_BAL: int` (Source: wiringPi.h)
+  - `PWM_MODE_MS: int` (Source: wiringPi.h)
+  - `PWM_OUTPUT: int` (Source: wiringPi.h)
+  - `PWM_TONE_OUTPUT: int` (Source: wiringPi.h)
+  - `SOFT_PWM_OUTPUT: int` (Source: wiringPi.h)
+  - `SOFT_TONE_OUTPUT: int` (Source: wiringPi.h)
+  - `WPI_MODE_GPIO: int` (Source: wiringPi.h)
+  - `WPI_MODE_GPIO_SYS: int` (Source: wiringPi.h)
+  - `WPI_MODE_PHYS: int` (Source: wiringPi.h)
+  - `WPI_MODE_PIFACE: int` (Source: wiringPi.h)
+  - `WPI_MODE_PINS: int` (Source: wiringPi.h)
+  - `WPI_MODE_UNINITIALISED: int` (Source: wiringPi.h)
+
+
+
+
+
+
 
 
 
