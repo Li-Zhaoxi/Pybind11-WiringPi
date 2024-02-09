@@ -46,7 +46,7 @@ cd ../..
 
 # Install the given wheel
 sudo pip3 install <path>/WiringPi-*.whl
-```aa
+```
 
 If you can `import WiringPi` correctly,  it means that you have successfully installed this project.
 
